@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+  <html>
+  <head>
+    <title>firebasechat</title>
+    <meta charset="UTF8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,shrink-to-fit=no">
+    <script
+    src="https://code.jquery.com/jquery-3.3.1.js"
+    integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60="
+    crossorigin="anonymous">
+
+  </script>
+    <script src="https://www.gstatic.com/firebasejs/4.13.0/firebase.js"></script>
+    <script>
+      // Initialize Firebase
+      var config = {
+        apiKey: "AIzaSyALJheVmhHzkkbVwyW2rD9SQFB8hnnXWiI",
+        authDomain: "fir-chat-f4734.firebaseapp.com",
+        databaseURL: "https://fir-chat-f4734.firebaseio.com",
+        projectId: "fir-chat-f4734",
+        storageBucket: "fir-chat-f4734.appspot.com",
+        messagingSenderId: "83041435326"
+      };
+      firebase.initializeApp(config);
+      $(function(){
+        firebase.auth().onAuthStateChanged(function(user){
+          if(user){
+            window.location.href="chokotochat.html";
+          }else{
+
+          }
+        });
+  $("#loginBtn").on("click",function(){
+          var provider = new firebase.auth.TwitterAuthProvider();
+          firebase.auth().signInWithRedirect(provider);
+        });
+
+
+      });
+      </script>
+      <style>
+       body{
+
+       }
+       .explain{
+           display:inline;
+           color:#ebebeb;
+       }
+        .title{
+          color:white;
+          font-weight: bold;
+          font-size:60px;
+          text-shadow:2px 2px 0px black,
+          2px -2px 0px black,
+          -2px 2px 0px black,
+          -2px -2px 0px black,
+          1px 1px 0px grey,
+          2px 2px 0px grey,
+          3px 3px 0px black;
+
+        }
+        .login:hover{
+          border:none;
+          background-color: #332930;
+          outline: none;
+          color:white;
+        }
+        .login{
+          width:100px;
+          height:100px;
+          margin-top:10%;
+          padding:0px;
+          border-radius:50%;
+          background-color: transparent;
+          text-shadow:1px 1px 0px black;
+
+          color:black
+          margin-left:auto;
+          margin-right:auto;
+          border:dashed 3px black;
+　　　　　　outline: none;
+        }
+        .content{
+         width:80%;
+         text-align: center;
+         margin-left: auto;
+         margin-right: auto;
+       }
+       .crow{
+         display:none;
+         width:100px;
+         height:100px;
+         position:absolute;
+         bottom:20%;
+         left:10%;
+         transform:rotate(45deg);
+         -webkit-transform:rotate(45deg);
+         -ms-transform:rotate(45deg);
+       }
+       .backimg{
+
+       }
+       .wrapper{
+         margin-top:10%;
+         height:100%;
+         width:100%;
+       }
+       body{
+         background-image:url("sky.jpg");
+       }
+      </style>
+  </head>
+  <body>
+  <div class="wrapper" id="parentwrapper">
+    <div class="content">
+     <p　><h1 class="title">ちょこっとチャット</h1></p>
+     <div class="explain">
+      twitterアカウントでログインしてチャットするサイトです
+     </div>
+     <div class="parent">
+      <button id="loginBtn" class="login">スタート</button>
+     </div>
+    </div>
+    <div class="backimg">
+      <img src="minicrow2.png" class="crow" id="img1">
+      <img src="minicrow2sec.png" class="crow" id="img2">
+    </div>
+  </div>
+  <script>
+
+   let img1 = document.getElementById("img1");
+   let img2 = document.getElementById("img2");
+   img2.style.display = "block";
+   let x1 = window.innerWidth*0.1;
+   let y = window.innerHeight*0.2;
+   let f = true;
+   let maxX = window.innerWidth/50;
+   let maxY = window.innerHeight/50;
+   let count = 0;
+   let flag=true;
+   let timer;
+   img2.onclick = function(){
+     if(flag){
+       timer = setInterval(function(){movecrow(50)},800);
+       flag = false;
+     }else{
+       clearInterval(timer);
+       flag = true;
+     }
+   };
+   img1.onclick = function(){
+     if(flag){
+       timer = setInterval(function(){movecrow(50)},800);
+       flag = false;
+     }else{
+       clearInterval(timer);
+       flag = true;
+     }
+   };
+   function movecrow(dif){
+     x1 += dif;
+     y += dif;
+        if(f){
+          img1.style.display = "block";
+          img1.style.left = x1+"px";
+          img1.style.bottom = y+"px";
+          img2.style.display = "none";
+
+        }else{
+          img2.style.display = "block";
+          img2.style.left = x1+"px";
+          img2.style.bottom = y+"px";
+          img1.style.display = "none";
+
+        }
+        f = !f;
+
+        count ++;
+        if(count > maxX || count > maxY){
+          x1 = 0;
+          y = 0;
+          count = 0;
+        }
+   }
+  </script>
+  </body>
+  </html>

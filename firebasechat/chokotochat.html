@@ -1,0 +1,453 @@
+<!doctype html>
+<html>
+<head>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
+  <meta name="viewport" content="width=device-width,initial-scale=1,shrink-to-fit=no">
+  <meta charset = "utf-8">
+  <title>ちょこっとチャット</title>
+  <meta charset="UTF8">
+  <script
+  src="https://code.jquery.com/jquery-3.3.1.js"
+  integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60="
+  crossorigin="anonymous">
+
+</script>
+<style>
+.mycont{
+  padding-top: 0px;
+  margin-top: 0px;
+  padding-bottom: 0px;
+  margin-bottom: 0px;
+  box-shadow: 0px 0px 10px 2px grey;
+}
+.title{
+  font-weight:600;
+}
+#myprof{
+  position:relative;
+  background-color:#a1a4b3;
+  text-align: center;
+  padding-top:10px;
+}
+#friendprof{
+  position:relative;
+  background-color:#a4b3a1;
+  text-align: center;
+  padding-top:10px;
+}
+.icon{
+  position:absolute;
+  top:62%;
+  left:10%;
+  width:80%;
+}
+.friendicon{
+  position:absolute;
+  top:62%;
+  left:10%;
+  width:80%;
+  transform:scale(-1,1);
+}
+ .bborder{
+   margin-bottom:0px;
+   padding-bottom: 0px;
+   background-color: #7f6363;
+ }
+
+ .mytext{
+   position:relative;
+   background-color:rgb(0,187,255);
+   border-radius:10px;
+   word-wrap:break-word;
+   margin-bottom:5px;
+   color:white;
+ }
+ .mytext:after{
+    content: "";
+    display: inline-block;
+    position: absolute;
+    top: 1px;
+    left: -12px;
+    border: 6px solid transparent;
+    border-right: 14px solid rgb(0,187,255);
+    -ms-transform: rotate(35deg);
+    -webkit-transform: rotate(35deg);
+    transform: rotate(35deg);
+
+ }
+ .friendtext{
+   background-color:rgb(144,255,0);
+   border-radius:10px;
+   color:white;
+   word-wrap:break-word;
+   margin-bottom:5px;
+ }
+ .friendtext:after{
+   content: "";
+   display: inline-block;
+   position: absolute;
+   top: 1px;
+   right: -12px;
+   border: 6px solid transparent;
+   border-left: 14px solid rgb(144,255,0);
+   -ms-transform: rotate(-35deg);
+   -webkit-transform: rotate(-35deg);
+   transform: rotate(-35deg);
+ }
+ .textstyle{
+   width:90%;
+   margin-left: auto;
+   margin-right: auto;
+ }
+
+ html,body{
+   height:100%;
+ }
+#wrapper{
+  margin:0px;
+  padding: 0px;
+  width:100%;
+  height:100%;
+  background:-webkit-linear-gradient(45deg #dc143c #660000);
+}
+
+#textarea{
+box-shadow:0px 0px 4px grey inset;
+overflow:scroll;
+background-color: white;
+}
+#gonext{
+  width:60%;
+  height:100%;
+  background-color: #638063;
+  color:white;
+  border-color: transparent;
+  margin-left: auto;
+  margin-right: auto;
+}
+#gonext:hover{
+  background-color: #3b4d3b;
+  outline: none;
+}
+#logout{
+  width:60%;
+  height:100%;
+  background-color: #636380;
+  color:white;
+  border-color:transparent;
+  margin-left: auto;
+  margin-right: auto;
+}
+#logout:hover{
+  background-color:#4f4f66;
+  outline: none;
+}
+.writebtn{
+  display:block;
+  border-radius: 50%;
+  background-color: #636380;
+  color:white;
+  border:none;
+  outline: none;
+  height:80px;
+  width:80px;
+  margin-top:10px;
+  margin-bottom:10px;
+  margin-left: auto;
+  margin-right:auto;
+}
+.writebtn:hover{
+  background-color:#4f4f66;
+  outline: none;
+}
+.header{
+  text-align:right;
+}
+.btnstyle{
+  margin-top:10px;
+  margin-bottom:10px;
+  text-align: center;
+}
+</style>
+<script src="https://www.gstatic.com/firebasejs/4.13.0/firebase.js"></script>
+<script>
+  // Initialize Firebase
+  var config = {
+    apiKey: "AIzaSyALJheVmhHzkkbVwyW2rD9SQFB8hnnXWiI",
+    authDomain: "fir-chat-f4734.firebaseapp.com",
+    databaseURL: "https://fir-chat-f4734.firebaseio.com",
+    projectId: "fir-chat-f4734",
+    storageBucket: "fir-chat-f4734.appspot.com",
+    messagingSenderId: "83041435326"
+  };
+  firebase.initializeApp(config);
+
+$(function(){
+     let h = $("body").outerHeight() - 110;
+     $("#textarea").css("height",h+"px");
+      var database = firebase.database();
+      var loggeduser;
+      var usernum;
+      let currentuser;
+      let photourl;
+      let userid;
+      let inputflag = 0;
+      let allunum;
+      firebase.auth().onAuthStateChanged(function(user){
+        if(user){
+            user.providerData.forEach(function (profile) {
+               userid = profile.uid;
+               currentuser = profile.displayName;
+               photourl = profile.photoURL;
+
+            });
+
+        }else{
+          window.location.href="index.html";
+        }
+      });
+      var connectedRef = database.ref(".info/connected");
+           connectedRef.on("value", function(snap) {
+             if (snap.val() === true) {
+             } else {
+                 database.ref("roominfo").update({usernum:--allunum});
+                 database.ref(loggeduser.roomname+"/usernumber").update({rn:-1});
+                 if(usernum == 1){
+                   database.ref("roominfo").update({rf:0});
+                 }
+               }
+            });
+        database.ref("roominfo").once("value").then(function(snapshot) {
+         allunum = snapshot.val().usernum+1;
+         var rf = snapshot.val().rf;
+
+         if(rf == 0){　//入室一人目の処理
+           loggeduser = new User(0,snapshot.val().roomnum+1);
+           database.ref("roominfo").update({roomnum:snapshot.val().roomnum+1,rf:1,usernum:allunum});
+           database.ref(loggeduser.roomname+"/usernumber").update({rn:1});    //roomの人数を更新
+
+
+        } else { //入室二人目の処理
+             loggeduser = new User(1,snapshot.val().roomnum);
+             database.ref("roominfo").update({rf:0,usernum:allunum});
+             database.ref(loggeduser.roomname+"/usernumber").update({rn:2});
+
+        }
+        //ここから人数関係ない共通の処理
+
+        database.ref(loggeduser.roomname+"/usernumber").on("value",function(snap){　　　//ユーザー数監視
+          usernum = snap.val().rn;
+          if(usernum == -1){
+            profclean();
+          }
+        });
+        loggeduser.profdisplay(); //相手のプロフィール書き込み
+        database.ref(loggeduser.roomname+"/comment/"+loggeduser.othermember()).on("child_added" ,function(content){
+          if(content.val().text != null){
+            edit(content.val().text,1);
+          }
+       });
+       $("textarea").on("input",function(){  //書き込み中ですを出す処理
+         inputflag = inputflag + 1;
+         if(inputflag == 1){
+           database.ref(loggeduser.roomname+"/userinfo/stateinfo/"+loggeduser.member).update({state:1});
+         }
+       });
+       $("textarea").change(function(){    //書き込み終了
+            database.ref(loggeduser.roomname+"/userinfo/stateinfo/"+loggeduser.member).update({state:0});
+         inputflag = 0;
+       });
+       database.ref(loggeduser.roomname+"/userinfo/stateinfo/"+loggeduser.othermember()).on('value',function(snap){
+
+                if(snap.val().state > 0){
+                  edit("書き込み中・・・",1);//書き込み中
+                }else{
+                  document.getElementById("textarea").lastElementChild.remove();//書き込み終了
+                }
+           });
+        database.ref("roominfo").on("child_changed",function(snap){
+          allunum=snap.val().usernum;
+        });
+        database.ref(loggeduser.roomname+"/userinfo/"+loggeduser.member).update({userid:userid,currentuser:currentuser,photourl:photourl});  //自分のプロフィール書き込み
+       　let img = $('<img>',{
+          src:photourl,
+       });
+       let profname = $('<h2>').text(currentuser);
+       let proflink = $('<a>',{
+         href:"https://twitter.com/intent/user?user_id="+userid,
+         target:"blank"
+       });
+       let paragragh = $('<p>');
+       paragragh.html(img);
+       proflink.text("プロフィール");
+       $("#myprof").append(paragragh);
+       $("#myprof").append(profname);
+       $("#myprof").append(proflink);
+
+
+    });  //roominfo.once 閉じかっこ
+
+
+
+    document.fm.btnfom.onclick=function(){
+      var textval=document.fm.textfm.value;
+      if(textval==""){
+
+      }else{
+      database.ref(loggeduser.roomname+"/comment/"+loggeduser.member).push({text:textval});
+       edit(textval,0);
+       document.fm.textfm.value = "";
+     }
+     };
+
+
+
+    $("#logout").on("click",function(){
+      if(usernum == 1){
+      database.ref("roominfo").update({rf:0});
+    }
+      database.ref(loggeduser.roomname+"/usernumber").update({rn:-1});
+      firebase.auth().signOut().then(function(){
+         window.location.href="index.html";
+      }).catch(function(error){
+        consol.log(error);
+      });
+    });
+
+    $("#gonext").on("click",function(){
+      window.location.href="chokotochat.html";
+    });
+  });    //$(function閉じタグ)
+
+  function profclean(){
+    $("#friednprof").empty();
+    $("#friendprof").text("退室しました、次の部屋へ行ってください");
+  }
+
+   function escapestr(str){
+     str =　str.replace(/&/g,'&amp');
+     str = str.replace(/</g, '&lt;');
+     str = str.replace(/>/g, '&gt;');
+     str = str.replace(/"/g, '&quot;');
+     str = str.replace(/'/g, '&#39;');
+     str = str.replace(/\n/g, '<br>');
+     return str;
+   }
+   function edit(text,op){
+     if(op == 1){
+     let mytr = $("<div>",{
+       "class":"row textstyle"
+     });
+     let mytd = $("<div>",{
+       "class":"col-6"
+     });
+     let fretd = document.createElement("div");
+     fretd.classList.add("col-6","friendtext");
+     fretd.innerHTML = escapestr(text);
+     mytr.append(mytd);
+     mytr.append(fretd);
+     $("#textarea").append(mytr);
+  }else{
+    let mytr = $("<div>",{
+      "class":"row textstyle"
+    });
+    let fretd = $("<div>",{
+      "class":"col-6"
+    });
+    let mytd = document.createElement("div");
+    mytd.classList.add("col-6","mytext");
+    mytd.innerHTML = escapestr(text);
+    mytr.append(mytd);
+    mytr.append(fretd);
+    $("#textarea").append(mytr);
+  }
+   document.getElementById("textarea").lastElementChild.scrollIntoView(false);
+  }
+ class User{
+   constructor(member,roomnum){
+     switch(member){
+       case 0:
+        this.member = "firstmem";
+        break;
+       case 1:
+        this.member = "secondmem";
+        break;
+       default:
+        this.member = "";
+   }
+   this.roomname = "room"+roomnum;
+ }
+  othermember(){
+     if(this.member == "firstmem"){
+       return "secondmem";
+     }else{
+       return "firstmem";
+     }
+  }
+  profdisplay(){
+    let id;
+    let purl;
+    let uname;
+    let other = this.othermember();
+    firebase.database().ref(this.roomname+"/userinfo/"+other).on("value",function(snap){
+       id = snap.val().userid;
+       purl = snap.val().photourl;
+       uname = snap.val().currentuser;
+       let img = $('<img>',{
+          src:purl,
+       });
+       let profname = $('<h2>').text(uname);
+       let proflink = $('<a>',{
+         href:"https://twitter.com/intent/user?user_id="+id,
+         target:"blank"
+       });
+       let paragragh = $('<p>');
+       paragragh.html(img);
+       proflink.text("プロフィール");
+       $("#friendprof").append(paragragh);
+       $("#friendprof").append(profname);
+       $("#friendprof").append(proflink);
+    });
+  }
+}
+
+</script>
+</head>
+<body>
+  <div id="wrapper"><!--<div class="header"><h1 class="title">ちょこっとチャット</h1></div>-->
+  <div class="container mycont">
+    <div class="row">
+      <div id="myprof" class="col-3">
+        <img src="childcrow2.png" class="icon" alt="crow">
+      </div>
+      <div id="textarea" class="col-6">
+      </div>
+      <div id="friendprof" class="col-3">
+        <div id="inout"></div>
+        <img src="childcrow2.png" class="friendicon" alt="crow">
+      </div>
+    </div>
+   <div class="bborder row">
+     <div class="col-md-3 btnstyle">
+       <button type="button" id="gonext" >次の部屋へ</button>
+     </div>
+     <div class="col-md-6">
+      <form name="fm" onsubmit="return false" class="form-inline">
+        <div class="form-group col-sm-8">
+       <textarea rows="3" cols="50" style="width:100%;" name="textfm"></textarea>
+     </div>
+     <div class="form-group col-sm-4">
+       <button  class="writebtn" name="btnfom" >話す</button>
+     </div>
+     </form>
+    </div>
+    <div class="col-md-3 btnstyle">
+      <button type="button" id="logout">ログアウト</button>
+    </div>
+   </div>
+ </div>
+</div>
+ <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js" integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T" crossorigin="anonymous"></script>
+</body>
+</html>
